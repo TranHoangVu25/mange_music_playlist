@@ -1,7 +1,14 @@
+import webbrowser
+
+
 class Video:
     def __init__(self,title,link):
         self.title = title
         self.link = link
+        self.seen = False
+    def open(self):
+        webbrowser.open(self.link)
+        self.seen = True
 class Playlist:
     def __init__(self,name,description,rating,videos):
         self.name = name
@@ -54,7 +61,7 @@ def print_videos_txt(file,videos):
         print_video_txt(file,videos[i])
 
 def print_playlist_txt(playlist):
-    with open("../output.txt", "w") as file:
+    with open("output.txt", "w") as file:
         file.write(playlist.name)
         file.write(playlist.description)
         file.write(str(playlist.rating))
@@ -75,7 +82,7 @@ def read_videos_txt(file):
     return videos
 
 def read_playlist_txt():
-    with open("data.txt", "r") as file:
+    with open("output.txt", "r") as file:
         name = file.readline()
         des = file.readline()
         rating = file.readline()
@@ -100,6 +107,47 @@ def add_video(playlist):
     link = input("Enter link:") +"\n"
     video = Video(title,link)
     playlist.videos.append(video)
+    return playlist
+
+def play_video(playlist):
+    print_videos(playlist.videos)
+    total = len(playlist.videos)
+    choice = select_in_range("Select video (1,"+str(total)+":)",1,total)
+    print("Open video: "+playlist.videos[choice-1].title+"---"+playlist.videos[choice-1].link)
+    playlist.videos[choice-1].open()
+
+def update_playlist(playlist):
+    print("Update playlist")
+    print("1.Name")
+    print("2.Description")
+    print("3.Rating")
+    print("4.All")
+    choice = select_in_range("Select option(1,3)",1,3)
+    if choice == 1:
+        name = input("Enter name:")
+        playlist.name = name
+        return playlist
+
+    if choice == 2:
+        description = input("Enter description:")
+        playlist.description = description
+        return playlist
+
+    if choice == 3:
+        rating = input("Enter rating:")
+        playlist.rating = rating
+        return playlist
+
+    # if choice == 4:
+    #     name = input("Enter name:")
+    #     description = input("Enter description:")
+    #     rating = input("Enter rating:")
+    #     playlist = Playlist(name,description,rating)
+    #     return playlist
+
+def delete_video(playlist):
+    choice = select_in_range("Select video that you want to delete(1"+str(len(playlist.videos)),1,len(playlist.videos))
+    del playlist.videos[choice-1]
     return playlist
 
 def show_menu():
@@ -130,15 +178,15 @@ def main():
             print_playlist(playlist)
             input("\nPress Enter to continue.\n")
         elif choice == 3:
-            pass
+            playlist = play_video(playlist)
         elif choice == 4:
             playlist = add_video(playlist)
             input("\nPress Enter to continue.\n")
 
         elif choice == 5:
-            pass
+            playlist = update_playlist(playlist)
         elif choice == 6:
-            pass
+            playlist = delete_video(playlist)
         elif choice == 7:
             print_playlist_txt(playlist)
             input("\nPress Enter to continue.\n")
